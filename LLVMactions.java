@@ -52,21 +52,50 @@ public class LLVMactions extends PrzemiBaseListener {
 
     // Funkcje operacji arytmetycznych
     // Operacja Dodawania
+
+   //  Dodawanie tych samych typów 
+   //  @Override 
+   //  public void exitAdd(PrzemiParser.AddContext ctx) { 
+   //     Value v1 = stack.pop();
+   //     Value v2 = stack.pop();
+   //     if( v1.type == v2.type ) {
+	 // if( v1.type == VarType.INT ){
+   //           LLVMGenerator.add_i32(v1.name, v2.name); 
+   //           stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
+   //        }
+	 // if( v1.type == VarType.REAL ){
+   //           LLVMGenerator.add_double(v1.name, v2.name); 
+   //           stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
+   //       }
+   //     } else {
+   //        error(ctx.getStart().getLine(), "Addition type mismatch");
+   //     }
+   //  }
+
     @Override 
     public void exitAdd(PrzemiParser.AddContext ctx) { 
        Value v1 = stack.pop();
        Value v2 = stack.pop();
        if( v1.type == v2.type ) {
-	  if( v1.type == VarType.INT ){
-             LLVMGenerator.add_i32(v1.name, v2.name); 
-             stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
+        if( v1.type == VarType.INT ){
+            LLVMGenerator.add_i32(v1.name, v2.name); 
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
+              }
+        if( v1.type == VarType.REAL ){
+            LLVMGenerator.add_double(v1.name, v2.name); 
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
+             }
+       } else if (v1.type != v2.type){
+          if (v1.type == VarType.INT) {
+            LLVMGenerator.sitofp(v1.name);
+            LLVMGenerator.add_double("%"+(LLVMGenerator.reg-1), v2.name);
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
           }
-	  if( v1.type == VarType.REAL ){
-             LLVMGenerator.add_double(v1.name, v2.name); 
-             stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
-         }
-       } else {
-          error(ctx.getStart().getLine(), "Addition type mismatch");
+          if (v2.type == VarType.INT) {
+            LLVMGenerator.sitofp(v2.name);
+            LLVMGenerator.add_double(v1.name, "%"+(LLVMGenerator.reg-1));
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
+          }
        }
     }
 
@@ -77,16 +106,25 @@ public class LLVMactions extends PrzemiBaseListener {
        Value v2 = stack.pop();
        if( v1.type == v2.type ) {
           if( v1.type == VarType.INT ){
-             LLVMGenerator.sub_i32(v1.name, v2.name); 
-             stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
+            LLVMGenerator.sub_i32(v1.name, v2.name); 
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
           }
           if( v1.type == VarType.REAL ){
-                   LLVMGenerator.sub_double(v1.name, v2.name); 
-                   stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
+            LLVMGenerator.sub_double(v1.name, v2.name); 
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
                }
-          } else {
-            error(ctx.getStart().getLine(), "Subtraction type mismatch");
+          } else if (v1.type != v2.type){
+          if (v1.type == VarType.INT) {
+            LLVMGenerator.sitofp(v1.name);
+            LLVMGenerator.sub_double("%"+(LLVMGenerator.reg-1), v2.name);
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
           }
+          if (v2.type == VarType.INT) {
+            LLVMGenerator.sitofp(v2.name);
+            LLVMGenerator.sub_double(v1.name, "%"+(LLVMGenerator.reg-1));
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
+          }
+       }
     }
 
     // Operacja Mnożenia
@@ -95,16 +133,25 @@ public class LLVMactions extends PrzemiBaseListener {
        Value v1 = stack.pop();
        Value v2 = stack.pop();
        if( v1.type == v2.type ) {
-	  if( v1.type == VarType.INT ){
-             LLVMGenerator.mult_i32(v1.name, v2.name); 
-             stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
+      	  if( v1.type == VarType.INT ){
+            LLVMGenerator.mult_i32(v1.name, v2.name); 
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
+                }
+      	  if( v1.type == VarType.REAL ){
+            LLVMGenerator.mult_double(v1.name, v2.name); 
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
+               }
+       } else if (v1.type != v2.type){
+          if (v1.type == VarType.INT) {
+            LLVMGenerator.sitofp(v1.name);
+            LLVMGenerator.mult_double("%"+(LLVMGenerator.reg-1), v2.name);
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
           }
-	  if( v1.type == VarType.REAL ){
-             LLVMGenerator.mult_double(v1.name, v2.name); 
-             stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
-         }
-       } else {
-          error(ctx.getStart().getLine(), "Multiplication type mismatch");
+          if (v2.type == VarType.INT) {
+            LLVMGenerator.sitofp(v2.name);
+            LLVMGenerator.mult_double(v1.name, "%"+(LLVMGenerator.reg-1));
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
+          }
        }
     }
 
@@ -114,16 +161,27 @@ public class LLVMactions extends PrzemiBaseListener {
        Value v1 = stack.pop();
        Value v2 = stack.pop();
        if( v1.type == v2.type ) {
-        if( v1.type == VarType.REAL ){
-          LLVMGenerator.div_double(v1.name, v2.name); 
-          stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
-        }
-       if( v1.type == VarType.INT ){
-          LLVMGenerator.div_i32(v1.name, v2.name); 
-          stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
-         } 
-       } else {
-          error(ctx.getStart().getLine(), "Division type mismatch");
+          if( v1.type == VarType.REAL ){
+            LLVMGenerator.div_double(v1.name, v2.name); 
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
+          }
+          if( v1.type == VarType.INT ){
+            LLVMGenerator.sitofp(v1.name);
+            LLVMGenerator.sitofp(v2.name);
+            LLVMGenerator.div_double("%"+(LLVMGenerator.reg-2), "%"+(LLVMGenerator.reg-1));
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
+           } 
+       } else if (v1.type != v2.type){
+          if (v1.type == VarType.INT) {
+            LLVMGenerator.sitofp(v1.name);
+            LLVMGenerator.div_double("%"+(LLVMGenerator.reg-1), v2.name);
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
+          }
+          if (v2.type == VarType.INT) {
+            LLVMGenerator.sitofp(v2.name);
+            LLVMGenerator.div_double(v1.name, "%"+(LLVMGenerator.reg-1));
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
+          }
        }
     }
 
