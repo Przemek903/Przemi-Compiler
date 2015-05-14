@@ -18,6 +18,10 @@ public class LLVMactions extends PrzemiBaseListener {
     HashMap<String, VarType> variables = new HashMap<String, VarType>();
     Stack<Value> stack = new Stack<Value>();
 
+// ------------------------------------------------------------------------------
+
+    // Przypisywanie wartosci do zmiennych
+
     @Override
     public void exitAssign(PrzemiParser.AssignContext ctx) { 
        String ID = ctx.ID().getText();
@@ -51,27 +55,8 @@ public class LLVMactions extends PrzemiBaseListener {
 //--------------------------------------------------------------------------
 
     // Funkcje operacji arytmetycznych
+    
     // Operacja Dodawania
-
-   //  Dodawanie tych samych typów 
-   //  @Override 
-   //  public void exitAdd(PrzemiParser.AddContext ctx) { 
-   //     Value v1 = stack.pop();
-   //     Value v2 = stack.pop();
-   //     if( v1.type == v2.type ) {
-	 // if( v1.type == VarType.INT ){
-   //           LLVMGenerator.add_i32(v1.name, v2.name); 
-   //           stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
-   //        }
-	 // if( v1.type == VarType.REAL ){
-   //           LLVMGenerator.add_double(v1.name, v2.name); 
-   //           stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
-   //       }
-   //     } else {
-   //        error(ctx.getStart().getLine(), "Addition type mismatch");
-   //     }
-   //  }
-
     @Override 
     public void exitAdd(PrzemiParser.AddContext ctx) { 
        Value v1 = stack.pop();
@@ -185,12 +170,11 @@ public class LLVMactions extends PrzemiBaseListener {
        }
     }
 
-
-    
-
-
 //--------------------------------------------------------------------------    
 
+    // Konwersja zmiennych
+
+    // Konwersja na zmienna typu Integer
     @Override 
     public void exitToint(PrzemiParser.TointContext ctx) { 
        Value v = stack.pop();
@@ -198,6 +182,7 @@ public class LLVMactions extends PrzemiBaseListener {
        stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
     }
 
+    // Konwersja na zmienna typu Double
     @Override 
     public void exitToreal(PrzemiParser.TorealContext ctx) { 
        Value v = stack.pop();
@@ -205,6 +190,11 @@ public class LLVMactions extends PrzemiBaseListener {
        stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) ); 
     }
 
+// ---------------------------------------------------------------------
+
+    // Obsluga danych wejsciowych i wyjsciowych
+
+    // Wyswietlanie
     @Override
     public void exitPrint(PrzemiParser.PrintContext ctx) {
        String ID = ctx.ID().getText();
@@ -219,7 +209,22 @@ public class LLVMactions extends PrzemiBaseListener {
        } else {
           error(ctx.getStart().getLine(), "unknown variable "+ID);
        }
-    } 
+    }
+
+    // Pobieranie danych
+    @Override
+    public void exitSet(PrzemiParser.SetContext ctx) {
+       String ID = ctx.ID().getText();
+       if( ! variables.containsKey(ID) ) {
+          variables.put(ID, VarType.INT);
+          LLVMGenerator.declare_i32(ID);          
+       } 
+       LLVMGenerator.scanf_i32(ID);
+    }
+
+// -------------------------------------------------------------------
+
+    // Obsluga bledow
 
    void error(int line, String msg){
        System.err.println("Error, line "+line+", "+msg);
