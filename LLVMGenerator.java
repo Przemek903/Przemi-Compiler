@@ -87,10 +87,17 @@ class LLVMGenerator{
    }
 
    static void ifend(){
+   }
+
+   static void elsestart(){
      int b = brstack.pop();
      main_text += "br label %false"+b+"\n";
      main_text += "false"+b+":\n";
-   } 
+   }
+
+   static void elseend(){
+   }
+
 
 //---------------------------------------------------------------------------------------
    // Operacje arytmetyczne

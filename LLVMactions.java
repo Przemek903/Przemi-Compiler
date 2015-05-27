@@ -69,6 +69,17 @@ public class LLVMactions extends PrzemiBaseListener {
     public void exitBlockif(PrzemiParser.BlockifContext ctx) {
        LLVMGenerator.ifend();
     }
+
+
+    @Override
+    public void enterBlockelse(PrzemiParser.BlockelseContext ctx) {
+       LLVMGenerator.elsestart();
+    }
+
+    @Override
+    public void exitBlockelse(PrzemiParser.BlockelseContext ctx) {
+       LLVMGenerator.elseend();
+    }
    
     @Override
     public void exitEqual(PrzemiParser.EqualContext ctx) { 

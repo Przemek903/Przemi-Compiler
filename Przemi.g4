@@ -6,7 +6,7 @@ prog: block
 block: ( stat? NEWLINE )* 
 ;
 
-stat:	  IF cond THEN blockif ENDIF          #if
+stat:	  IF cond THEN blockif elsecond ENDIF          #if
       | ID '=' expr1		              #assign
 	| PRINT ID   		              #print
       | SET ID                              #set
@@ -19,7 +19,14 @@ expr1:  expr2			        #single1
       | expr2 SUB expr2               #sub  
 ;
 
+elsecond: ELSE blockelse
+      |
+;
+
 blockif: block
+;
+
+blockelse: block
 ;
 
 cond:   ID '==' INT           #equal  
@@ -40,6 +47,9 @@ SET: 'set'
 ;
 
 IF: 'if'
+;
+
+ELSE: 'else'
 ;
 
 THEN: 'do'
