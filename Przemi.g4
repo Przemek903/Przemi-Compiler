@@ -29,7 +29,12 @@ blockif: block
 blockelse: block
 ;
 
-cond:   ID '==' INT           #equal  
+cond:   ID '==' INT           #equal
+      | ID '>'  INT           #more
+      | ID '<'  INT           #less
+      | ID '!=' INT           #notequal
+      | ID '>=' INT           #moreoreq
+      | ID '<=' INT           #lessoreq
 ;
 
 expr2:  INT			                #int

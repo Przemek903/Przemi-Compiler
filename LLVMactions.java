@@ -56,6 +56,7 @@ public class LLVMactions extends PrzemiBaseListener {
 
 // Instrukcja warunkowa IF
 
+// IF
     @Override
     public void exitIf(PrzemiParser.IfContext ctx) { 
     }
@@ -70,6 +71,7 @@ public class LLVMactions extends PrzemiBaseListener {
        LLVMGenerator.ifend();
     }
 
+// ELSE
 
     @Override
     public void enterBlockelse(PrzemiParser.BlockelseContext ctx) {
@@ -80,13 +82,76 @@ public class LLVMactions extends PrzemiBaseListener {
     public void exitBlockelse(PrzemiParser.BlockelseContext ctx) {
        LLVMGenerator.elseend();
     }
-   
+
+// Warunki
+  // Równe 
     @Override
     public void exitEqual(PrzemiParser.EqualContext ctx) { 
        String ID = ctx.ID().getText();
        String INT = ctx.INT().getText();
        if( variables.containsKey(ID) ) {
-          LLVMGenerator.icmp( ID, INT );
+          LLVMGenerator.icmpeq( ID, INT );
+       } else {
+          ctx.getStart().getLine();
+          System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
+       }
+    }
+  // Wieksze
+    @Override
+    public void exitMore(PrzemiParser.MoreContext ctx) { 
+       String ID = ctx.ID().getText();
+       String INT = ctx.INT().getText();
+       if( variables.containsKey(ID) ) {
+          LLVMGenerator.icmpmore( ID, INT );
+       } else {
+          ctx.getStart().getLine();
+          System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
+       }
+    }
+  // Mniejsze
+    @Override
+    public void exitLess(PrzemiParser.LessContext ctx) { 
+       String ID = ctx.ID().getText();
+       String INT = ctx.INT().getText();
+       if( variables.containsKey(ID) ) {
+          LLVMGenerator.icmpless( ID, INT );
+       } else {
+          ctx.getStart().getLine();
+          System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
+       }
+    }
+  // Nierówne
+    @Override
+    public void exitNotequal(PrzemiParser.NotequalContext ctx) { 
+       String ID = ctx.ID().getText();
+       String INT = ctx.INT().getText();
+       if( variables.containsKey(ID) ) {
+          LLVMGenerator.icmpneq( ID, INT );
+       } else {
+          ctx.getStart().getLine();
+          System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
+       }
+    }
+
+    // Wieksze równe
+    @Override
+    public void exitMoreoreq(PrzemiParser.MoreoreqContext ctx) { 
+       String ID = ctx.ID().getText();
+       String INT = ctx.INT().getText();
+       if( variables.containsKey(ID) ) {
+          LLVMGenerator.icmpmoreoreq( ID, INT );
+       } else {
+          ctx.getStart().getLine();
+          System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
+       }
+    }
+  // Mniejsze równe
+    @Override
+    public void exitLessoreq(PrzemiParser.LessoreqContext ctx) { 
+       String ID = ctx.ID().getText();
+       String INT = ctx.INT().getText();
+       if( variables.containsKey(ID) ) {
+          LLVMGenerator.icmplessoreq( ID, INT );
        } else {
           ctx.getStart().getLine();
           System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);

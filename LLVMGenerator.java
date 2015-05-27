@@ -72,11 +72,36 @@ class LLVMGenerator{
 //---------------------------------------------------------------------------------------
 
    // Instrukcja warunkowa IF
-   static void icmp(String id, String value){
+
+   static void conditionHelper(String id, String value, String cond){
      main_text += "%"+reg+" = load i32* %"+id+"\n";
      reg++;
-     main_text += "%"+reg+" = icmp eq i32 %"+(reg-1)+", "+value+"\n";
+     main_text += "%"+reg+" = icmp "+cond+" i32 %"+(reg-1)+", "+value+"\n";
      reg++;
+   }
+
+   static void icmpeq(String id, String value){
+     conditionHelper(id, value, "eq");
+   }
+
+   static void icmpmore(String id, String value){
+     conditionHelper(id, value, "sgt");
+   }
+
+   static void icmpless(String id, String value){
+     conditionHelper(id, value, "slt");
+   }
+
+   static void icmpneq(String id, String value){
+     conditionHelper(id, value, "ne");
+   }
+
+   static void icmpmoreoreq(String id, String value){
+     conditionHelper(id, value, "sge");
+   }
+
+   static void icmplessoreq(String id, String value){
+     conditionHelper(id, value, "sle");
    }
 
    static void ifstart(){
@@ -91,7 +116,7 @@ class LLVMGenerator{
 
    static void elsestart(){
      int b = brstack.pop();
-     main_text += "br label %false"+b+"\n";
+     main_text += "ret i32 0\n";
      main_text += "false"+b+":\n";
    }
 
