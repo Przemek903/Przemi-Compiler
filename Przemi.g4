@@ -1,11 +1,15 @@
 grammar Przemi;
 
-prog: ( stat? NEWLINE )* 
+prog: block 
+; 
+
+block: ( stat? NEWLINE )* 
 ;
 
-stat:	 ID '=' expr1		    #assign
-	| PRINT ID   		    #print
-      | SET ID                    #set
+stat:	  IF cond THEN blockif ENDIF          #if
+      | ID '=' expr1		              #assign
+	| PRINT ID   		              #print
+      | SET ID                              #set
 ;
 
 expr1:  expr2			        #single1
@@ -15,6 +19,12 @@ expr1:  expr2			        #single1
       | expr2 SUB expr2               #sub  
 ;
 
+blockif: block
+;
+
+cond:   ID '==' INT           #equal  
+;
+
 expr2:  INT			                #int
       | REAL			          #real
       | TOINT expr2		          #toint
@@ -22,10 +32,20 @@ expr2:  INT			                #int
       | '(' expr1 ')'		          #par
 ;	
 
-PRINT:	'p' 
+      
+PRINT: 'p' 
 ;
 
-SET:  'set'
+SET: 'set'
+;
+
+IF: 'if'
+;
+
+THEN: 'do'
+;
+
+ENDIF: 'end'
 ;
 
 TOINT: '(int)'

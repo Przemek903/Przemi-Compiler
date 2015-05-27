@@ -50,7 +50,37 @@ public class LLVMactions extends PrzemiBaseListener {
     @Override 
     public void exitReal(PrzemiParser.RealContext ctx) { 
          stack.push( new Value(ctx.REAL().getText(), VarType.REAL) );       
-    } 
+    }
+
+// -------------------------------------------------------------------------
+
+// Instrukcja warunkowa IF
+
+    @Override
+    public void exitIf(PrzemiParser.IfContext ctx) { 
+    }
+
+    @Override
+    public void enterBlockif(PrzemiParser.BlockifContext ctx) {
+       LLVMGenerator.ifstart();
+    }
+
+    @Override
+    public void exitBlockif(PrzemiParser.BlockifContext ctx) {
+       LLVMGenerator.ifend();
+    }
+   
+    @Override
+    public void exitEqual(PrzemiParser.EqualContext ctx) { 
+       String ID = ctx.ID().getText();
+       String INT = ctx.INT().getText();
+       if( variables.containsKey(ID) ) {
+          LLVMGenerator.icmp( ID, INT );
+       } else {
+          ctx.getStart().getLine();
+          System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
+       }
+    }
 
 //--------------------------------------------------------------------------
 

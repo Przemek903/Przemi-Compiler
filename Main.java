@@ -1,6 +1,3 @@
-// Intro to ANTLR+LLVM
-// sawickib, 2014-04-26
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 

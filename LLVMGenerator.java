@@ -1,10 +1,16 @@
+import java.util.Stack;
 
 class LLVMGenerator{
    
    static String header_text = "";
    static String main_text = "";
    static int reg = 1;
+   static int br = 0;
 
+   static Stack<Integer> brstack = new Stack<Integer>();
+
+// -------------------------------------------------
+   // Wyswietlanie
    static void printf_i32(String id){
       main_text += "%"+reg+" = load i32* %"+id+"\n";
       reg++;
@@ -19,7 +25,8 @@ class LLVMGenerator{
       reg++;
    }
 
-
+// ---------------------------------------------------
+   // Pobieranie danych 
    static void scanf_i32(String id){
       main_text += "%"+reg+" = call i32 (i8*, ...)* @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8]* @strs, i32 0, i32 0), i32* %"+id+")\n";
       reg++;      
@@ -30,6 +37,8 @@ class LLVMGenerator{
       reg++;      
    }
 
+// --------------------------------------------------
+   // Deklaracja
    static void declare_i32(String id){
       main_text += "%"+id+" = alloca i32\n";
    }
@@ -38,6 +47,8 @@ class LLVMGenerator{
       main_text += "%"+id+" = alloca double\n";
    }
 
+// --------------------------------------------------
+   // Przypisywanie
    static void assign_i32(String id, String value){
       main_text += "store i32 "+value+", i32* %"+id+"\n";
    }
@@ -46,7 +57,8 @@ class LLVMGenerator{
       main_text += "store double "+value+", double* %"+id+"\n";
    }
 
-
+// --------------------------------------------------
+   // Wczytywanie
    static void load_i32(String id){
       main_text += "%"+reg+" = load i32* %"+id+"\n";
       reg++;
@@ -56,6 +68,29 @@ class LLVMGenerator{
       main_text += "%"+reg+" = load double* %"+id+"\n";
       reg++;
    }
+
+//---------------------------------------------------------------------------------------
+
+   // Instrukcja warunkowa IF
+   static void icmp(String id, String value){
+     main_text += "%"+reg+" = load i32* %"+id+"\n";
+     reg++;
+     main_text += "%"+reg+" = icmp eq i32 %"+(reg-1)+", "+value+"\n";
+     reg++;
+   }
+
+   static void ifstart(){
+     br++;
+     main_text += "br i1 %"+(reg-1)+", label %true"+br+", label %false"+br+"\n";
+     main_text += "true"+br+":\n";
+     brstack.push(br);
+   }
+
+   static void ifend(){
+     int b = brstack.pop();
+     main_text += "br label %false"+b+"\n";
+     main_text += "false"+b+":\n";
+   } 
 
 //---------------------------------------------------------------------------------------
    // Operacje arytmetyczne
