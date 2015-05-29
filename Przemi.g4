@@ -6,7 +6,8 @@ prog: block
 block: ( stat? NEWLINE )* 
 ;
 
-stat:	  IF cond THEN blockif elsecond ENDIF          #if
+stat:	  IF cond DO blockif elsecond END     #if
+      | DO rep TIMES blockfor END           #repeat
       | ID '=' expr1		              #assign
 	| PRINT ID   		              #print
       | SET ID                              #set
@@ -28,6 +29,8 @@ blockif: block
 
 blockelse: block
 ;
+blockfor: block
+;
 
 cond:   ID '==' INT           #equal
       | ID '>'  INT           #more
@@ -44,11 +47,20 @@ expr2:  INT			                #int
       | '(' expr1 ')'		          #par
 ;	
 
+rep:  value
+;
+
+value:  ID
+      | INT
+;
       
 PRINT: 'p' 
 ;
 
 SET: 'set'
+;
+
+TIMES: 'times'
 ;
 
 IF: 'if'
@@ -57,10 +69,10 @@ IF: 'if'
 ELSE: 'else'
 ;
 
-THEN: 'do'
+DO: 'do'
 ;
 
-ENDIF: 'end'
+END: 'end'
 ;
 
 TOINT: '(int)'

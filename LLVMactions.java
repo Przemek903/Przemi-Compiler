@@ -17,6 +17,7 @@ public class LLVMactions extends PrzemiBaseListener {
     
     HashMap<String, VarType> variables = new HashMap<String, VarType>();
     Stack<Value> stack = new Stack<Value>();
+    String value;
 
 // ------------------------------------------------------------------------------
 
@@ -34,6 +35,22 @@ public class LLVMactions extends PrzemiBaseListener {
        if( v.type == VarType.REAL ){
          LLVMGenerator.declare_double(ID);
          LLVMGenerator.assign_double(ID, v.name);
+       } 
+    }
+
+    @Override 
+    public void exitValue(PrzemiParser.ValueContext ctx) { 
+       if( ctx.ID() != null ){
+         String ID = ctx.ID().getText();     
+         if( variables.containsKey(ID) ) {
+            LLVMGenerator.load_i32( ID );
+            value = "%"+(LLVMGenerator.reg-1); 
+         } else {
+            error(ctx.getStart().getLine(), "unknown variable "+ID);         
+         }
+       } 
+       if( ctx.INT() != null ){
+         value = ctx.INT().getText();       
        } 
     }
 
@@ -157,6 +174,21 @@ public class LLVMactions extends PrzemiBaseListener {
           System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
        }
     }
+
+// ---------------------------------------------------
+// Petla 
+
+    @Override
+    public void exitRep(PrzemiParser.RepContext ctx) { 
+       LLVMGenerator.repeatstart(value);
+    }
+
+    @Override
+    public void exitBlockfor(PrzemiParser.BlockforContext ctx) {
+       if( ctx.getParent() instanceof PrzemiParser.RepeatContext ){
+          LLVMGenerator.repeatend();
+       }
+    } 
 
 //--------------------------------------------------------------------------
 
